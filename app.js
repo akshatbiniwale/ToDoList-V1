@@ -2,50 +2,48 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const app = express();
+var task;
+var taskList = [];
+var workTaskList = [];
 
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 app.get("/", function(req, res){
     var today = new Date();
     var currentDay = today.getDay();
     var day="";
 
-    switch (currentDay) {
-        case 0:
-            day = "Sunday"
-            break;
+    var options = { 
+        weekday: 'long',
+        month: 'long', 
+        day: 'numeric' 
+    };
 
-        case 1:
-            day = "Monday"
-            break;
-        
-        case 2:
-            day = "Tuesday"
-            break;
+    day = today.toLocaleDateString("en-US", options);
 
-        case 3:
-            day = "Wednesday"
-            break;
+    res.render("list", {listTitle: day, listItem: taskList});
+});
 
-        case 4:
-            day = "Thursday"
-            break;
+app.post("/", function(req, res){
 
-        case 5:
-            day = "Friday"
-            break;
-
-        case 6:
-            day = "Saturday"
-            break;
-
-        default:
-            console.log("Error occurred in: " + currentDay);
-            break;
+    if(req.body.list === "Work List"){
+        workTaskList.push(req.body.task);
+        res.redirect("/work");
     }
+    else{
+        taskList.push(req.body.task);
+        res.redirect("/");
+    }
+});
 
-    console.log(day);
-    res.render("list", {kindOfDay: day});
+app.get("/work", function(req, res){
+    res.render("list", {listTitle: "Work List", listItem: workTaskList});
+});
+
+app.get("/about", function(req, res){
+    res.render("about");
 });
 
 app.listen(4000, function(){
