@@ -1,16 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const taskManager = require("./mongodb");
 
 const app = express();
-var task;
-var taskList = [];
-var workTaskList = [];
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.get("/", function(req, res){
+app.get("/", async function(req, res){
     var today = new Date();
     var currentDay = today.getDay();
     var day="";
@@ -23,17 +21,22 @@ app.get("/", function(req, res){
 
     day = today.toLocaleDateString("en-US", options);
 
+    const taskList = await taskManager.find();
+
     res.render("list", {listTitle: day, listItem: taskList});
 });
 
-app.post("/", function(req, res){
+app.post("/", async function(req, res){
 
     if(req.body.list === "Work List"){
         workTaskList.push(req.body.task);
         res.redirect("/work");
     }
     else{
-        taskList.push(req.body.task);
+        const data = {
+            name: req.body.task
+        }
+        await taskManager.insertMany([data]);
         res.redirect("/");
     }
 });
