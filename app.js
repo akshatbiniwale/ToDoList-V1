@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const taskManager = require("./mongodb");
 
 const app = express();
+var errMsg = "";
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,7 +24,7 @@ app.get("/", async function(req, res){
 
     const taskList = await taskManager.find();
 
-    res.render("list", {listTitle: day, listItem: taskList});
+    res.render("list", {listTitle: day, listItem: taskList, errorMessage: errMsg});
 });
 
 app.post("/", async function(req, res){
@@ -33,12 +34,25 @@ app.post("/", async function(req, res){
         res.redirect("/work");
     }
     else{
-        const data = {
-            name: req.body.task
+        const taskVal = req.body.task;
+        if(taskVal != ''){
+            errMsg = ""
+            const data = {
+                name: taskVal
+            }
+            await taskManager.insertMany([data]);
+        }else{
+            errMsg = "Error: Value is NULL"
         }
-        await taskManager.insertMany([data]);
         res.redirect("/");
     }
+});
+
+app.post("/delete", function(req, res){
+    setTimeout(async () => {
+        await taskManager.deleteOne({_id: req.body.checks})
+        res.redirect("/");
+    }, 500);
 });
 
 app.get("/work", function(req, res){
