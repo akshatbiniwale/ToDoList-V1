@@ -17,4 +17,20 @@ const taskSchema = new mongoose.Schema({
 
 const task = new mongoose.model("task", taskSchema);
 
-module.exports = task;
+const categorySchema = new mongoose.Schema({
+    category: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    }
+})
+
+const secondTask = new mongoose.model("secondTask", categorySchema);
+
+module.exports = {
+    firstSchema : task,
+    secondSchema : secondTask
+}
