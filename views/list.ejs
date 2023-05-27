@@ -1,14 +1,12 @@
 <%- include('header'); -%>
 
-        <div id="status"><%= errorMessage %></div>
-
         <div class="box" id="heading">
             <h1><%= listHead %> List</h1>
             <h3><%=listTitle%></h3>
         </div>
 
         <div class="box">
-            <form action="/delete" method="post">
+            <form action="/<%= listHead %>/delete" method="post">
                 <% listItem.forEach(function(i){ %>
                     <div class="item">
                         <input type="checkbox" name="checks" value="<%=i._id%>" onchange="this.form.submit()">
